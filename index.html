@@ -3,19 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat-App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Wetter App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to bottom, #87CEFA, #f0f8ff);
+            color: #333;
+            padding: 50px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .weather {
+            margin-top: 20px;
+        }
+        .weather img {
+            width: 100px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat-App</h1>
+    <h1>Wetter App</h1>
+    <input type="text" id="city" placeholder="Stadt eingeben">
+    <button onclick="getWeather()">Wetter anzeigen</button>
 
-    <div id="messages"></div> <!-- Hier werden die Nachrichten angezeigt -->
+    <div class="weather" id="weather"></div>
 
-    <div id="input-area">
-        <input type="text" id="messageInput" placeholder="Gib deine Nachricht ein">
-        <button id="sendMessageBtn">Senden</button>
-    </div>
+    <script>
+        const API_KEY = "DEIN_API_KEY_HIER"; // hier deinen OpenWeatherMap API-Key einfügen
 
-    <script src="client.js"></script>
+        async function getWeather() {
+            const city = document.getElementById('city').value;
+            if (!city) {
+                alert("Bitte eine Stadt eingeben!");
+                return;
+            }
+
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=de`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Stadt nicht gefunden");
+                const data = await response.json();
+
+                document.getElementById('weather').innerHTML = `
+                    <h2>${data.name}, ${data.sys.country}</h2>
+                    <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="Wetter">
+                    <p>${data.weather[0].description}</p>
+                    <p>🌡️ Temperatur: ${data.main.temp} °C</p>
+                    <p>💨 Wind: ${data.wind.speed} m/s</p>
+                `;
+            } catch (err) {
+                document.getElementById('weather').innerHTML = `<p>${err.message}</p>`;
+            }
+        }
+    </script>
 </body>
 </html>
+
